@@ -81,6 +81,7 @@ public final class ProducerBatch {
 
     public ProducerBatch(TopicPartition tp, MemoryRecordsBuilder recordsBuilder, long createdMs) {
         this(tp, recordsBuilder, createdMs, false);
+        log.info("ProducerBatch created {}", tp);
     }
 
     public ProducerBatch(TopicPartition tp, MemoryRecordsBuilder recordsBuilder, long createdMs, boolean isSplitBatch) {
@@ -95,6 +96,7 @@ public final class ProducerBatch {
         float compressionRatioEstimation = CompressionRatioEstimator.estimation(topicPartition.topic(),
                                                                                 recordsBuilder.compressionType());
         recordsBuilder.setEstimatedCompressionRatio(compressionRatioEstimation);
+        log.info("ProducerBatch created splitBatch {}", tp);
     }
 
     /**
@@ -238,7 +240,7 @@ public final class ProducerBatch {
         if (this.finalState.get() != FinalState.SUCCEEDED) {
             if (tryFinalState == FinalState.SUCCEEDED) {
                 // Log if a previously unsuccessful batch succeeded later on.
-                log.debug("ProduceResponse returned {} for {} after batch with base offset {} had already been {}.",
+                log.info("ProduceResponse returned {} for {} after batch with base offset {} had already been {}.",
                     tryFinalState, topicPartition, baseOffset, this.finalState.get());
             } else {
                 // FAILED --> FAILED and ABORTED --> FAILED transitions are ignored.
@@ -401,6 +403,7 @@ public final class ProducerBatch {
 
     void drained(long nowMs) {
         this.drainedMs = Math.max(drainedMs, nowMs);
+        log.info("ProducerBatch drained.");
     }
 
     boolean isSplitBatch() {
